@@ -1,0 +1,47 @@
+import {fetch} from 'wix-fetch';
+import {getSecret} from 'wix-secrets-backend';
+
+export const getAnswerFromAI = async (prompt)=>{
+    const url = "https://api.openai.com/v1/completions"
+    const apiKey = await getSecret("Chat_GPT_API");
+    const body = {
+  "model": "text-davinci-003",
+  "prompt": prompt,
+  "max_tokens": 150,
+  "temperature": 0.5,
+    }
+    const options = {
+        method: "POST",
+        headers:{
+            'Content-Type': "application/json", 
+            'Authorization': `Bearer ${apiKey}` 
+
+
+        },
+        body: JSON.stringify(body),
+    }
+const response = await fetch(url, options);
+console.log(response);
+
+const data = await response.json();
+
+
+return data.choices[0].text;
+}
+
+//introduction - string
+//all promps conversation + ai answers - array of objects
+
+//
+
+export const generatePrompt = async (chatArray)=> {
+    let introduction =  "You are testing this now.";
+    //let conversation = "";
+    chatArray.forEach((entry)=>{
+       const chatLine = `${entry.name}: ${entry.text}.`;
+       introduction += chatLine;
+    })
+    const answer = await getAnswerFromAI(introduction);
+    return answer;
+
+}
