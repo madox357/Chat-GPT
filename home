@@ -1,0 +1,31 @@
+// Velo API Reference: https://www.wix.com/velo/reference/api-overview/introduction
+import { getAnswerFromAI, generatePrompt } from 'backend/open-ai';
+$w.onReady(function () {
+
+    let chatArray = [];
+
+    const askQuestion = async () => {
+        $w("#loadingAnimation").show()
+        const text = $w("#textInput").value;
+        chatArray.push({
+            name: "User",
+            text,
+            _id: Math.floor(Math.random() * 1000).toString()
+        })
+        const answer = await generatePrompt(chatArray);
+        chatArray.push({
+            name: "Rep",
+            text: answer,
+            _id: Math.floor(Math.random() * 1000).toString()
+        })
+        $w("#chatLogRepeater").data = chatArray;
+        $w("#loadingAnimation").hide();
+        $w("#chatLogRepeater").show();
+    }
+    $w("#chatLogRepeater").onItemReady(($item, itemData) => {
+        $item("#text").text = `${itemData.name}: ${itemData.text}`;
+
+    })
+    $w("#askButton").onClick(askQuestion);
+
+});
